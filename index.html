@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>For My Favorite Human ✨</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            --pink: #ffb6c1;
+            --green: #c1ffcf;
+            --dark-green: #2d5a27;
+            --hot-pink: #ff6b6b;
+            --bg: #fff5f7;
+        }
+
+        body {
+            background-color: var(--bg);
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        #game-container {
+            background: white;
+            padding: 40px;
+            border-radius: 30px;
+            border: 4px solid var(--pink);
+            box-shadow: 10px 10px 0px var(--green);
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            position: relative;
+            transition: all 0.5s ease;
+        }
+
+        .hidden { display: none !important; }
+
+        /* Interface Styles */
+        h1 { color: var(--hot-pink); margin-bottom: 20px; }
+        p { color: #555; line-height: 1.5; }
+        
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            background: var(--green);
+            border: 2px solid var(--dark-green);
+            border-radius: 20px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: bold;
+            font-size: 1rem;
+            transition: 0.3s;
+        }
+
+        .btn:hover {
+            background: var(--pink);
+            border-color: var(--hot-pink);
+            transform: scale(1.05);
+        }
+
+        /* Input Area */
+        textarea {
+            width: 100%;
+            padding: 15px;
+            border-radius: 15px;
+            border: 2px solid var(--pink);
+            font-family: inherit;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+        }
+
+        /* Popups */
+        .overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            border-radius: 25px;
+            z-index: 100;
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        .heart-bg {
+            position: absolute;
+            font-size: 2rem;
+            color: var(--pink);
+            opacity: 0.3;
+            z-index: -1;
+            animation: float 3s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="game-container">
+        <div id="start-screen">
+            <div class="heart-bg" style="top:10%; left:10%;">❤️</div>
+            <div class="heart-bg" style="bottom:10%; right:10%;">💖</div>
+            <h1>🌸 Access Portal 🌸</h1>
+            <p>Welcome, love. I've prepared a small verification for you to prove you're really my boy.</p>
+            <button class="btn" onclick="nextStep('start-screen', 'quiz-area')">Start Verification</button>
+        </div>
+
+        <div id="quiz-area" class="hidden">
+            <h2 id="q-title" style="color: var(--dark-green);">Question</h2>
+            <div id="q-content"></div>
+        </div>
+
+        <div id="msg-overlay" class="hidden">
+            <h2 id="msg-text" style="color: var(--hot-pink);"></h2>
+            <button class="btn" id="msg-btn">Continue</button>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 0;
+
+        const questions = [
+            {
+                title: "Are you taken? 💍",
+                type: "choice",
+                options: ["Yes", "No"],
+                onCorrect: "Ooh she must be lucky! 😉",
+                logic: (choice) => choice === "Yes"
+            },
+            {
+                title: "Why are you so cute? ",
+                type: "free",
+                onCorrect: "Yes baby, idk what you answered but you are indeed my lovely cute boy ❤️"
+            },
+            {
+                title: "Did you enjoy your 23yo? 🎂",
+                type: "free",
+                onCorrect: "I enjoy my life with you and you mean a lot to me, I hope your next year gonna be amazing as you are ✨"
+            },
+            {
+                title: "Do you want a kiss? 💋",
+                type: "choice",
+                options: ["Yes", "No"],
+                logic: (choice) => false, // Forces the fail message
+                onFail: "Ops, try again love I didn't hear you "
+            }
+        ];
+
+        function nextStep(hideId, showId) {
+            document.getElementById(hideId).classList.add('hidden');
+            document.getElementById(showId).classList.remove('hidden');
+            if(showId === 'quiz-area') loadQuestion();
+        }
+
+        function loadQuestion() {
+            const q = questions[currentStep];
+            document.getElementById('q-title').innerText = q.title;
+            const container = document.getElementById('q-content');
+            container.innerHTML = '';
+
+            if(q.type === "choice") {
+                q.options.forEach(opt => {
+                    const b = document.createElement('button');
+                    b.className = 'btn';
+                    b.innerText = opt;
+                    b.onclick = () => handleChoice(opt);
+                    container.appendChild(b);
+                });
+            } else {
+                container.innerHTML = `
+                    <textarea id="free-ans" placeholder="Tell me everything..."></textarea>
+                    <button class="btn" onclick="handleChoice('free')">Submit Answer</button>
+                `;
+            }
+        }
+
+        function handleChoice(val) {
+            const q = questions[currentStep];
+            
+            // Special logic for the Kiss question
+            if(currentStep === 3) {
+                showPopup(q.onFail, loadSecretChoices);
+                return;
+            }
+
+            // Normal Questions
+            if(q.type === "free" || q.logic(val)) {
+                showPopup(q.onCorrect, () => {
+                    currentStep++;
+                    loadQuestion();
+                });
+            } else {
+                showPopup("Are you dumb? Think again! 🙄", loadQuestion);
+            }
+        }
+
+        function loadSecretChoices() {
+            document.getElementById('q-title').innerText = "Try again...";
+            const container = document.getElementById('q-content');
+            container.innerHTML = '';
+            const secrets = ["YESSSSS", "yes please", "are you playing with me"];
+            
+            secrets.forEach(s => {
+                const b = document.createElement('button');
+                b.className = 'btn';
+                b.innerText = s;
+                b.onclick = () => {
+                    if(s === "are you playing with me") {
+                        showPopup("Yes 😉", loadSecretChoices);
+                    } else {
+                        finalWin();
+                    }
+                };
+                container.appendChild(b);
+            });
+        }
+
+        function showPopup(text, callback) {
+            const overlay = document.getElementById('msg-overlay');
+            document.getElementById('msg-text').innerText = text;
+            overlay.classList.remove('hidden');
+            document.getElementById('msg-btn').onclick = () => {
+                overlay.classList.add('hidden');
+                callback();
+            };
+        }
+
+        function finalWin() {
+            document.getElementById('quiz-area').innerHTML = `
+                <h1 style="color: var(--hot-pink);">Mwah! 💋</h1>
+                <p>I love you love of my life, I really hope you enjoyed this small gift.</p>
+                <p>Stay always safe and don't forget that I love you so much. ❤️</p>
+                <div style="font-size: 3rem; margin-top:20px;">✨💖</div>
+            `;
+            confetti({
+                particleCount: 200,
+                spread: 100,
+                colors: ['#ffb6c1', '#c1ffcf', '#ff6b6b']
+            });
+        }
+
+        // Initialize
+    </script>
+</body>
+</html>
