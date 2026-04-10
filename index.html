@@ -7,11 +7,11 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <style>
         :root {
-            --pink: #ffb6c1;
-            --green: #c1ffcf;
-            --dark-green: #2d5a27;
+            --pink: #E6748E;
+            --green: #6BB1AD;
+            --dark-green: #A7BCBD;
             --hot-pink: #ff6b6b;
-            --bg: #fff5f7;
+            --bg: #EDECDB;
         }
 
         body {
@@ -148,7 +148,7 @@
             {
                 title: "Did you enjoy your 23yo? 🎂",
                 type: "free",
-                onCorrect: "I enjoy my life with you and you mean a lot to me, I hope your next year gonna be amazing as you are ✨"
+                onCorrect: "i hope you did because I enjoy my life with you and you mean a lot to me, I hope your next year gonna be amazing as you are ✨"
             },
             {
                 title: "Do you want a kiss? 💋",
@@ -203,7 +203,7 @@
                     loadQuestion();
                 });
             } else {
-                showPopup("Are you dumb? Think again! 🙄", loadQuestion);
+                showPopup("Are you dumb? Think again! ", loadQuestion);
             }
         }
 
@@ -219,7 +219,7 @@
                 b.innerText = s;
                 b.onclick = () => {
                     if(s === "are you playing with me") {
-                        showPopup("Yes 😉", loadSecretChoices);
+                        showPopup("Yes so whot ", loadSecretChoices);
                     } else {
                         finalWin();
                     }
@@ -238,12 +238,16 @@
             };
         }
 
+
+        // Initialize
         function finalWin() {
             document.getElementById('quiz-area').innerHTML = `
                 <h1 style="color: var(--hot-pink);">Mwah! 💋</h1>
+                <img src="https://pin.it/6XniWkJpB" 
+                     style="width:100%; border-radius:15px; margin: 10px 0;">
                 <p>I love you love of my life, I really hope you enjoyed this small gift.</p>
                 <p>Stay always safe and don't forget that I love you so much. ❤️</p>
-                <div style="font-size: 3rem; margin-top:20px;">✨💖</div>
+                <div style="font-size: 3rem; margin-top:20px;">👑✨💚💖</div>
             `;
             confetti({
                 particleCount: 200,
@@ -251,8 +255,6 @@
                 colors: ['#ffb6c1', '#c1ffcf', '#ff6b6b']
             });
         }
-
-        // Initialize
     </script>
 </body>
 </html>
